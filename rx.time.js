@@ -1,11 +1,23 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-(function (root, factory) {
-    var freeExports = typeof exports == 'object' && exports,
-        freeModule = typeof module == 'object' && module && module.exports == freeExports && module,
-        freeGlobal = typeof global == 'object' && global;
-    if (freeGlobal.global === freeGlobal) {
-        window = freeGlobal;
+;(function (factory) {
+    var objectTypes = {
+        'boolean': false,
+        'function': true,
+        'object': true,
+        'number': false,
+        'string': false,
+        'undefined': false
+    };
+
+    var root = (objectTypes[typeof window] && window) || this,
+        freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports,
+        freeModule = objectTypes[typeof module] && module && !module.nodeType && module,
+        moduleExports = freeModule && freeModule.exports === freeExports && freeExports,
+        freeGlobal = objectTypes[typeof global] && global;
+    
+    if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
+        root = freeGlobal;
     }
 
     // Because of build optimizers
@@ -19,7 +31,7 @@
     } else {
         root.Rx = factory(root, {}, root.Rx);
     }
-}(this, function (global, exp, Rx, undefined) {
+}.call(this, function (root, exp, Rx, undefined) {
     
     // Refernces
     var Observable = Rx.Observable,
@@ -256,38 +268,7 @@
     observableProto.throttle = function (dueTime, scheduler) {
         scheduler || (scheduler = timeoutScheduler);
         var source = this;
-        return new AnonymousObservable(function (observer) {
-            var cancelable = new SerialDisposable(), hasvalue = false, id = 0, subscription, value = null;
-            subscription = source.subscribe(function (x) {
-                var currentId, d;
-                hasvalue = true;
-                value = x;
-                id++;
-                currentId = id;
-                d = new SingleAssignmentDisposable();
-                cancelable.setDisposable(d);
-                d.setDisposable(scheduler.scheduleWithRelative(dueTime, function () {
-                    if (hasvalue && id === currentId) {
-                        observer.onNext(value);
-                    }
-                    hasvalue = false;
-                }));
-            }, function (exception) {
-                cancelable.dispose();
-                observer.onError(exception);
-                hasvalue = false;
-                id++;
-            }, function () {
-                cancelable.dispose();
-                if (hasvalue) {
-                    observer.onNext(value);
-                }
-                observer.onCompleted();
-                hasvalue = false;
-                id++;
-            });
-            return new CompositeDisposable(subscription, cancelable);
-        });
+        return this.throttleWithSelector(function () { return observableTimer(dueTime, scheduler); })
     };
 
     /**

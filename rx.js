@@ -1,18 +1,26 @@
 // Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.
 
-(function (window, undefined) {
+;(function (undefined) {
 
-    var freeExports = typeof exports == 'object' && exports,
-        freeModule = typeof module == 'object' && module && module.exports == freeExports && module,
-        freeGlobal = typeof global == 'object' && global;
-    if (freeGlobal.global === freeGlobal) {
-        window = freeGlobal;
+    var objectTypes = {
+        'boolean': false,
+        'function': true,
+        'object': true,
+        'number': false,
+        'string': false,
+        'undefined': false
+    };
+
+    var root = (objectTypes[typeof window] && window) || this,
+        freeExports = objectTypes[typeof exports] && exports && !exports.nodeType && exports,
+        freeModule = objectTypes[typeof module] && module && !module.nodeType && module,
+        moduleExports = freeModule && freeModule.exports === freeExports && freeExports,
+        freeGlobal = objectTypes[typeof global] && global;
+    
+    if (freeGlobal && (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal)) {
+        root = freeGlobal;
     }
 
-     /** 
-     * @name Rx
-     * @type Object
-     */
     var Rx = { Internals: {} };
     
     // Defaults
@@ -498,124 +506,89 @@
      */
     var disposableEmpty = Disposable.empty = { dispose: noop };
 
+    var BooleanDisposable = (function () {
+        function BooleanDisposable (isSingle) {
+            this.isSingle = isSingle;
+            this.isDisposed = false;
+            this.current = null;
+        }
+
+        var booleanDisposablePrototype = BooleanDisposable.prototype;
+
+        /**
+         * Gets the underlying disposable.
+         * @return The underlying disposable.
+         */
+        booleanDisposablePrototype.getDisposable = function () {
+            return this.current;
+        };
+
+        /**
+         * Sets the underlying disposable.
+         * @param {Disposable} value The new underlying disposable.
+         */  
+        booleanDisposablePrototype.setDisposable = function (value) {
+            if (this.current && this.isSingle) {
+                throw new Error('Disposable has already been assigned');
+            }
+
+            var shouldDispose = this.isDisposed, old;
+            if (!shouldDispose) {
+                old = this.current;
+                this.current = value;
+            }
+            if (old) {
+                old.dispose();
+            }
+            if (shouldDispose && value) {
+                value.dispose();
+            }
+        };
+
+        /** 
+         * Disposes the underlying disposable as well as all future replacements.
+         */
+        booleanDisposablePrototype.dispose = function () {
+            var old;
+            if (!this.isDisposed) {
+                this.isDisposed = true;
+                old = this.current;
+                this.current = null;
+            }
+            if (old) {
+                old.dispose();
+            }
+        };
+
+        return BooleanDisposable;
+    }());
+
     /**
      * Represents a disposable resource which only allows a single assignment of its underlying disposable resource.
      * If an underlying disposable resource has already been set, future attempts to set the underlying disposable resource will throw an Error.
-     * 
-     * @constructor
      */
-    var SingleAssignmentDisposable = Rx.SingleAssignmentDisposable = function () {
-        this.isDisposed = false;
-        this.current = null;
-    };
+    var SingleAssignmentDisposable = Rx.SingleAssignmentDisposable = (function (super_) {
+        inherits(SingleAssignmentDisposable, super_);
 
-    var SingleAssignmentDisposablePrototype = SingleAssignmentDisposable.prototype;
+        function SingleAssignmentDisposable() {
+            super_.call(this, true);
+        }
 
-    /**
-     *  Gets the underlying disposable. After disposal, the result of getting this method is undefined. 
-     * @returns {Disposable} The underlying disposable.
-     */  
-    SingleAssignmentDisposablePrototype.getDisposable = function () {
-        return this.current;
-    };
-
-    /* @private */
-    SingleAssignmentDisposable.disposable = function (value) {
-        return arguments.length ? this.getDisposable() : this.setDisposable(value);
-    };
-
-    /**
-     *  Sets the underlying disposable. 
-     * @param {Disposable} value The new underlying disposable.
-     */
-    SingleAssignmentDisposablePrototype.setDisposable = function (value) {
-        if (this.current) {
-            throw new Error('Disposable has already been assigned');
-        }
-        var shouldDispose = this.isDisposed;
-        if (!shouldDispose) {
-            this.current = value;
-        }
-        if (shouldDispose && value) {
-            value.dispose();
-        }
-    };
-
-    /** 
-     * Disposes the underlying disposable.
-     */
-    SingleAssignmentDisposablePrototype.dispose = function () {
-        var old;
-        if (!this.isDisposed) {
-            this.isDisposed = true;
-            old = this.current;
-            this.current = null;
-        }
-        if (old) {
-            old.dispose();
-        }
-    };
+        return SingleAssignmentDisposable;
+    }(BooleanDisposable));
 
     /**
      * Represents a disposable resource whose underlying disposable resource can be replaced by another disposable resource, causing automatic disposal of the previous underlying disposable resource.
-     * @constructor 
      */
-    var SerialDisposable = Rx.SerialDisposable = function () {
-        this.isDisposed = false;
-        this.current = null;
-    };
+    var SerialDisposable = Rx.SerialDisposable = (function (super_) {
+        inherits(SerialDisposable, super_);
 
-    var serialDisposablePrototype = SerialDisposable.prototype;
+        function SerialDisposable() {
+            super_.call(this, false);
+        }
 
-    /**
-     * Gets the underlying disposable.
-     * @return The underlying disposable.
-     */
-    serialDisposablePrototype.getDisposable = function () {
-        return this.current;
-    };
-
-    /**
-     * Sets the underlying disposable.
-     * @param {Disposable} value The new underlying disposable.
-     */  
-    serialDisposablePrototype.setDisposable = function (value) {
-        var shouldDispose = this.isDisposed, old;
-        if (!shouldDispose) {
-            old = this.current;
-            this.current = value;
-        }
-        if (old) {
-            old.dispose();
-        }
-        if (shouldDispose && value) {
-            value.dispose();
-        }
-    };
-
-    /* @private */
-    serialDisposablePrototype.disposable = function (value) {
-        if (!value) {
-            return this.getDisposable();
-        } else {
-            this.setDisposable(value);
-        }
-    };
-
-    /** 
-     * Disposes the underlying disposable as well as all future replacements.
-     */
-    serialDisposablePrototype.dispose = function () {
-        var old;
-        if (!this.isDisposed) {
-            this.isDisposed = true;
-            old = this.current;
-            this.current = null;
-        }
-        if (old) {
-            old.dispose();
-        }
-    };
+        return SerialDisposable;
+    }(BooleanDisposable));
 
     /**
      * Represents a disposable resource that only disposes its underlying disposable resource when all dependent disposable objects have been disposed.
@@ -679,18 +652,12 @@
         return RefCountDisposable;
     })();
 
-    /**
-     * @constructor
-     * @private
-     */
     function ScheduledDisposable(scheduler, disposable) {
-        this.scheduler = scheduler, this.disposable = disposable, this.isDisposed = false;
+        this.scheduler = scheduler;
+        this.disposable = disposable;
+        this.isDisposed = false;
     }
 
-    /** 
-     * @private
-     * @memberOf ScheduledDisposable#
-     */
     ScheduledDisposable.prototype.dispose = function () {
         var parent = this;
         this.scheduler.schedule(function () {
@@ -824,11 +791,11 @@
          * @returns {Disposable} The disposable object used to cancel the scheduled recurring action (best effort).
          */
         schedulerProto.schedulePeriodicWithState = function (state, period, action) {
-            var s = state, id = window.setInterval(function () {
+            var s = state, id = setInterval(function () {
                 s = action(s);
             }, period);
             return disposableCreate(function () {
-                window.clearInterval(id);
+                clearInterval(id);
             });
         };
 
@@ -989,6 +956,8 @@
 
         return Scheduler;
     }());
+
+    var normalizeTime = Scheduler.normalize;
     
     var SchedulePeriodicRecursive = Rx.Internals.SchedulePeriodicRecursive = (function () {
         function tick(command, recurse) {
@@ -1019,19 +988,16 @@
         return SchedulePeriodicRecursive;
     }());
 
-    var schedulerNoBlockError = 'Scheduler is not allowed to block the thread';
-
     /**
      * Gets a scheduler that schedules work immediately on the current thread.
      */    
     var immediateScheduler = Scheduler.immediate = (function () {
 
-        function scheduleNow(state, action) {
-            return action(this, state);
-        }
+        function scheduleNow(state, action) { return action(this, state); }
 
         function scheduleRelative(state, dueTime, action) {
-            if (dueTime > 0) throw new Error(schedulerNoBlockError);
+            var dt = normalizeTime(dt);
+            while (dt - this.now() > 0) { }
             return action(this, state);
         }
 
@@ -1061,8 +1027,7 @@
             while (queue.length > 0) {
                 item = queue.dequeue();
                 if (!item.isCancelled()) {
-                    while (item.dueTime - Scheduler.now() > 0) {
-                    }
+                    while (item.dueTime - Scheduler.now() > 0) { }
                     if (!item.isCancelled()) {
                         item.invoke();
                     }
@@ -1075,7 +1040,7 @@
         }
 
         function scheduleRelative(state, dueTime, action) {
-            var dt = this.now() + Scheduler.normalize(dueTime),
+            var dt = this.now() + normalizeTime(dueTime),
                     si = new ScheduledItem(this, state, action, dt),
                     t;
             if (!queue) {
@@ -1112,24 +1077,35 @@
     }());
 
     
+    var reNative = RegExp('^' +
+      String(toString)
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/toString| for [^\]]+/g, '.*?') + '$'
+    );
+
+    var setImmediate = typeof (setImmediate = freeGlobal && moduleExports && freeGlobal.setImmediate) == 'function' &&
+        !reNative.test(setImmediate) && setImmediate,
+        clearImmediate = typeof (clearImmediate = freeGlobal && moduleExports && freeGlobal.clearImmediate) == 'function' &&
+        !reNative.test(clearImmediate) && clearImmediate;
+
     var scheduleMethod, clearMethod = noop;
     (function () {
         function postMessageSupported () {
             // Ensure not in a worker
-            if (!window.postMessage || window.importScripts) { return false; }
+            if (!root.postMessage || root.importScripts) { return false; }
             var isAsync = false, 
-                oldHandler = window.onmessage;
+                oldHandler = root.onmessage;
             // Test for async
-            window.onmessage = function () { isAsync = true; };
-            window.postMessage('','*');
-            window.onmessage = oldHandler;
+            root.onmessage = function () { isAsync = true; };
+            root.postMessage('','*');
+            root.onmessage = oldHandler;
 
             return isAsync;
         }
 
         // Check for setImmediate first for Node v0.11+
-        if (typeof window.setImmediate === 'function') {
-            scheduleMethod = window.setImmediate;
+        if (typeof setImmediate === 'function') {
+            scheduleMethod = setImmediate;
             clearMethod = clearImmediate;
         } else if (typeof process !== 'undefined' && {}.toString.call(process) === '[object process]') {
             scheduleMethod = process.nextTick;
@@ -1148,19 +1124,19 @@
                 }
             }
 
-            if (window.addEventListener) {
-                window.addEventListener('message', onGlobalPostMessage, false);
+            if (root.addEventListener) {
+                root.addEventListener('message', onGlobalPostMessage, false);
             } else {
-                window.attachEvent('onmessage', onGlobalPostMessage, false);
+                root.attachEvent('onmessage', onGlobalPostMessage, false);
             }
 
             scheduleMethod = function (action) {
                 var currentId = taskId++;
                 tasks[currentId] = action;
-                window.postMessage(MSG_PREFIX + currentId, '*');
+                root.postMessage(MSG_PREFIX + currentId, '*');
             };
-        } else if (!!window.MessageChannel) {
-            var channel = new window.MessageChannel(),
+        } else if (!!root.MessageChannel) {
+            var channel = new root.MessageChannel(),
                 channelTasks = {},
                 channelTaskId = 0;
 
@@ -1176,22 +1152,22 @@
                 channelTasks[id] = action;
                 channel.port2.postMessage(id);     
             };
-        } else if ('document' in window && 'onreadystatechange' in window.document.createElement('script')) {
+        } else if ('document' in root && 'onreadystatechange' in root.document.createElement('script')) {
             
             scheduleMethod = function (action) {
-                var scriptElement = window.document.createElement('script');
+                var scriptElement = root.document.createElement('script');
                 scriptElement.onreadystatechange = function () { 
                     action();
                     scriptElement.onreadystatechange = null;
                     scriptElement.parentNode.removeChild(scriptElement);
                     scriptElement = null;  
                 };
-                window.document.documentElement.appendChild(scriptElement);  
+                root.document.documentElement.appendChild(scriptElement);  
             };
  
         } else {
-            scheduleMethod = function (action) { return window.setTimeout(action, 0); };
-            clearMethod = window.clearTimeout;
+            scheduleMethod = function (action) { return setTimeout(action, 0); };
+            clearMethod = clearTimeout;
         }
     }());
 
@@ -1220,13 +1196,13 @@
                 return scheduler.scheduleWithState(state, action);
             }
             var disposable = new SingleAssignmentDisposable();
-            var id = window.setTimeout(function () {
+            var id = setTimeout(function () {
                 if (!disposable.isDisposed) {
                     disposable.setDisposable(action(scheduler, state));
                 }
             }, dt);
             return new CompositeDisposable(disposable, disposableCreate(function () {
-                window.clearTimeout(id);
+                clearTimeout(id);
             }));
         }
 
@@ -1458,10 +1434,9 @@
      * @constructor
      * @private
      */
-    var Enumerator = Rx.Internals.Enumerator = function (moveNext, getCurrent, dispose) {
+    var Enumerator = Rx.Internals.Enumerator = function (moveNext, getCurrent) {
         this.moveNext = moveNext;
         this.getCurrent = getCurrent;
-        this.dispose = dispose;
     };
 
     /**
@@ -1469,9 +1444,8 @@
      * @memberOf Enumerator
      * @private
      */
-    var enumeratorCreate = Enumerator.create = function (moveNext, getCurrent, dispose) {
+    var enumeratorCreate = Enumerator.create = function (moveNext, getCurrent) {
         var done = false;
-        dispose || (dispose = noop);
         return new Enumerator(function () {
             if (done) {
                 return false;
@@ -1479,138 +1453,99 @@
             var result = moveNext();
             if (!result) {
                 done = true;
-                dispose();
             }
             return result;
-        }, function () { return getCurrent(); }, function () {
-            if (!done) {
-                dispose();
-                done = true;
-            }
-        });
+        }, function () { return getCurrent(); });
     };
     
-    /** @private */
-    var Enumerable = Rx.Internals.Enumerable = (function () {
+    var Enumerable = Rx.Internals.Enumerable = function (getEnumerator) {
+        this.getEnumerator = getEnumerator;
+    };
 
-        /** 
-         * @constructor
-         * @private
-         */
-        function Enumerable(getEnumerator) {
-            this.getEnumerator = getEnumerator;
-        }
+    Enumerable.prototype.concat = function () {
+        var sources = this;
+        return new AnonymousObservable(function (observer) {
+            var e = sources.getEnumerator(), isDisposed, subscription = new SerialDisposable();
+            var cancelable = immediateScheduler.scheduleRecursive(function (self) {
+                var current, hasNext;
+                if (isDisposed) { return; }
 
-        /** 
-         * @private
-         * @memberOf Enumerable#
-         */
-        Enumerable.prototype.concat = function () {
-            var sources = this;
-            return new AnonymousObservable(function (observer) {
-                var e = sources.getEnumerator(), isDisposed = false, subscription = new SerialDisposable();
-                var cancelable = immediateScheduler.scheduleRecursive(function (self) {
-                    var current, ex, hasNext = false;
-                    if (!isDisposed) {
-                        try {
-                            hasNext = e.moveNext();
-                            if (hasNext) {
-                                current = e.getCurrent();
-                            } else {
-                                e.dispose();
-                            }
-                        } catch (exception) {
-                            ex = exception;
-                            e.dispose();
-                        }
+                try {
+                    hasNext = e.moveNext();
+                    if (hasNext) {
+                        current = e.getCurrent();
+                    } 
+                } catch (ex) {
+                    observer.onError(ex);
+                    return;
+                }
+
+                if (!hasNext) {
+                    observer.onCompleted();
+                    return;
+                }
+
+                var d = new SingleAssignmentDisposable();
+                subscription.setDisposable(d);
+                d.setDisposable(current.subscribe(
+                    observer.onNext.bind(observer),
+                    observer.onError.bind(observer),
+                    function () { self(); })
+                );
+            });
+            return new CompositeDisposable(subscription, cancelable, disposableCreate(function () {
+                isDisposed = true;
+            }));
+        });
+    };
+
+    Enumerable.prototype.catchException = function () {
+        var sources = this;
+        return new AnonymousObservable(function (observer) {
+            var e = sources.getEnumerator(), isDisposed, lastException;
+            var subscription = new SerialDisposable();
+            var cancelable = immediateScheduler.scheduleRecursive(function (self) {
+                var current, hasNext;
+                if (isDisposed) { return; }
+
+                try {
+                    hasNext = e.moveNext();
+                    if (hasNext) {
+                        current = e.getCurrent();
+                    } 
+                } catch (ex) {
+                    observer.onError(ex);
+                    return;
+                }
+
+                if (!hasNext) {
+                    if (lastException) {
+                        observer.onError(lastException);
                     } else {
-                        return;
-                    }
-                    if (ex) {
-                        observer.onError(ex);
-                        return;
-                    }
-                    if (!hasNext) {
                         observer.onCompleted();
-                        return;
                     }
-                    var d = new SingleAssignmentDisposable();
-                    subscription.setDisposable(d);
-                    d.setDisposable(current.subscribe(
-                        observer.onNext.bind(observer),
-                        observer.onError.bind(observer),
-                        function () { self(); })
-                    );
-                });
-                return new CompositeDisposable(subscription, cancelable, disposableCreate(function () {
-                    isDisposed = true;
-                    e.dispose();
-                }));
+                    return;
+                }
+
+                var d = new SingleAssignmentDisposable();
+                subscription.setDisposable(d);
+                d.setDisposable(current.subscribe(
+                    observer.onNext.bind(observer),
+                    function (exn) {
+                        lastException = exn;
+                        self();
+                    },
+                    observer.onCompleted.bind(observer)));
             });
-        };
+            return new CompositeDisposable(subscription, cancelable, disposableCreate(function () {
+                isDisposed = true;
+            }));
+        });
+    };
 
-        /** 
-         * @private
-         * @memberOf Enumerable#
-         */
-        Enumerable.prototype.catchException = function () {
-            var sources = this;
-            return new AnonymousObservable(function (observer) {
-                var e = sources.getEnumerator(), isDisposed = false, lastException;
-                var subscription = new SerialDisposable();
-                var cancelable = immediateScheduler.scheduleRecursive(function (self) {
-                    var current, ex, hasNext;
-                    hasNext = false;
-                    if (!isDisposed) {
-                        try {
-                            hasNext = e.moveNext();
-                            if (hasNext) {
-                                current = e.getCurrent();
-                            }
-                        } catch (exception) {
-                            ex = exception;
-                        }
-                    } else {
-                        return;
-                    }
-                    if (ex) {
-                        observer.onError(ex);
-                        return;
-                    }
-                    if (!hasNext) {
-                        if (lastException) {
-                            observer.onError(lastException);
-                        } else {
-                            observer.onCompleted();
-                        }
-                        return;
-                    }
-                    var d = new SingleAssignmentDisposable();
-                    subscription.setDisposable(d);
-                    d.setDisposable(current.subscribe(
-                        observer.onNext.bind(observer),
-                        function (exn) {
-                            lastException = exn;
-                            self();
-                        },
-                        observer.onCompleted.bind(observer)));
-                });
-                return new CompositeDisposable(subscription, cancelable, disposableCreate(function () {
-                    isDisposed = true;
-                }));
-            });
-        };
 
-        return Enumerable;
-    }());
-
-    /** 
-     * @static
-     * @private
-     * @memberOf Enumerable
-     */
     var enumerableRepeat = Enumerable.repeat = function (value, repeatCount) {
-        if (repeatCount === undefined) {
+        if (arguments.length === 1) {
             repeatCount = -1;
         }
         return new Enumerable(function () {
@@ -1628,19 +1563,14 @@
         });
     };
 
-    /** 
-     * @static
-     * @private
-     * @memberOf Enumerable
-     */    
-    var enumerableFor = Enumerable.forEach = function (source, selector) {
+    var enumerableFor = Enumerable.forEach = function (source, selector, thisArg) {
         selector || (selector = identity);
         return new Enumerable(function () {
             var current, index = -1;
             return enumeratorCreate(
                 function () {
                     if (++index < source.length) {
-                        current = selector(source[index], index);
+                        current = selector.call(thisArg, source[index], index, source);
                         return true;
                     }
                     return false;
@@ -2133,25 +2063,13 @@
      *  
      * @example
      *  var res = Rx.Observable.create(function (observer) { return function () { } );
+     *  var res = Rx.Observable.create(function (observer) { return Rx.Disposable.empty; } ); 
+     *  var res = Rx.Observable.create(function (observer) { } ); 
      *  
      * @param {Function} subscribe Implementation of the resulting observable sequence's subscribe method, returning a function that will be wrapped in a Disposable.
      * @returns {Observable} The observable sequence with the specified implementation for the Subscribe method.
      */
-    Observable.create = function (subscribe) {
-        return new AnonymousObservable(function (o) {
-            return disposableCreate(subscribe(o));
-        });
-    };
-
-    /**
-     *  Creates an observable sequence from a specified subscribe method implementation.
-     *  
-     * @example
-     *  var res = Rx.Observable.create(function (observer) { return Rx.Disposable.empty; } );        
-     * @param {Function} subscribe Implementation of the resulting observable sequence's subscribe method.
-     * @returns {Observable} The observable sequence with the specified implementation for the Subscribe method.
-     */
-    Observable.createWithDisposable = function (subscribe) {
+    Observable.create = Observable.createWithDisposable = function (subscribe) {
         return new AnonymousObservable(subscribe);
     };
 
@@ -3870,6 +3788,17 @@
     var AnonymousObservable = Rx.Internals.AnonymousObservable = (function (_super) {
         inherits(AnonymousObservable, _super);
 
+        // Fix subscriber to check for undefined or function returned to decorate as Disposable
+        function fixSubscriber(subscriber) {
+            if (typeof subscriber === 'undefined') {
+                subscriber = disposableEmpty;
+            } else if (typeof subscriber === 'function') {
+                subscriber = disposableCreate(subscriber);
+            }
+
+            return subscriber;
+        }
+
         function AnonymousObservable(subscribe) {
             if (!(this instanceof AnonymousObservable)) {
                 return new AnonymousObservable(subscribe);
@@ -3880,7 +3809,7 @@
                 if (currentThreadScheduler.scheduleRequired()) {
                     currentThreadScheduler.schedule(function () {
                         try {
-                            autoDetachObserver.setDisposable(subscribe(autoDetachObserver));
+                            autoDetachObserver.setDisposable(fixSubscriber(subscribe(autoDetachObserver)));
                         } catch (e) {
                             if (!autoDetachObserver.fail(e)) {
                                 throw e;
@@ -3889,7 +3818,7 @@
                     });
                 } else {
                     try {
-                        autoDetachObserver.setDisposable(subscribe(autoDetachObserver));
+                        autoDetachObserver.setDisposable(fixSubscriber(subscribe(autoDetachObserver)));
                     } catch (e) {
                         if (!autoDetachObserver.fail(e)) {
                             throw e;
@@ -4284,19 +4213,21 @@
         return AnonymousSubject;
     }(Observable));
 
-    // Check for AMD
     if (typeof define == 'function' && typeof define.amd == 'object' && define.amd) {
-        window.Rx = Rx;
-        return define(function () {
+        root.Rx = Rx;
+
+        define(function() {
             return Rx;
         });
-    } else if (freeExports) {
-        if (typeof module == 'object' && module && module.exports == freeExports) {
-            module.exports = Rx;
+    } else if (freeExports && freeModule) {
+        // in Node.js or RingoJS
+        if (moduleExports) {
+            (freeModule.exports = Rx).Rx = Rx;
         } else {
-            freeExports = Rx;
+          freeExports.Rx = Rx;
         }
     } else {
-        window.Rx = Rx;
+        // in a browser or Rhino
+        root.Rx = Rx;
     }
-}(this));
+}.call(this));

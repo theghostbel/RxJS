@@ -13,7 +13,7 @@ Reactive Programming is a hot topic as of late, especially with such things as t
 
 ## About the Reactive Extensions ##
 
-The Reactive Extensions for JavaScript (RxJS) is a set of libraries for composing asynchronous and event-based programs using observable sequences and fluent query operators modeled after Language Integrated Queries ([LINQ](http://en.wikipedia.org/wiki/LINQ)). Using RxJS, developers represent asynchronous data streams with Observables, query asynchronous data streams using our many operators, and parameterize the concurrency in the asynchronous data streams using Schedulers. Simply put, RxJS = Observables + Operators + Schedulers.
+The Reactive Extensions for JavaScript (RxJS) is a set of libraries for composing asynchronous and event-based programs using observable sequences and fluent query operators that many of you already know by Array#extras in JavaScript. Using RxJS, developers represent asynchronous data streams with Observables, query asynchronous data streams using our many operators, and parameterize the concurrency in the asynchronous data streams using Schedulers. Simply put, RxJS = Observables + Operators + Schedulers.
 
 Whether you are authoring a web-based application in JavaScript or a server-side application in Node.js, you have to deal with asynchronous and event-based programming as a matter of course. Although some patterns are emerging such as the Promise pattern, handling exceptions, cancellation, and synchronization is difficult and error-prone.
 
@@ -29,13 +29,13 @@ var source = getStockData();
 
 source
     .filter(function (quote) { 
-        return quote.symbol === 'MSFT'; 
+        return quote.price > 30; 
     })
     .map(function (quote) { 
         return quote.price;
     })
     .forEach(function (price) {
-        console.log('MSFT Stock Prices: $' + price);
+        console.log('Prices higher than $30: $' + price);
     });
 ```
 
@@ -47,14 +47,14 @@ var source = getAsyncStockData();
 
 var subscription = source
     .filter(function (quote) { 
-        return quote.symbol === 'MSFT'; 
+        return quote.price > 30; 
     })
     .map(function (quote) { 
         return quote.price;
     })
     .subscribe(
         function (price) {
-            console.log('MSFT Stock Prices: $' + price);
+            console.log('Prices higher than $30: $' + price);
         },
         function (err) {
             console.log('Something went wrong: ' + err.message);
@@ -70,18 +70,17 @@ The only difference is that we can handle the errors inline with our subscriptio
 
 This set of libraries include:
 
-- **rx.js** - core library for ES5 compliant browsers and runtimes
-- **rx.compat.js** - core library for older non-ES5 compliant browsers.
-- **rx.aggregates.js** - aggregation event processing query operations
-- **rx.async.js** - async operationrs such as events, callbacks and promises
-- **rx.async.compat.js** - async operationrs such as events, callbacks and promises with support back to IE6
-- **rx.binding.js** - binding operators including multicast, publish, publishLast, publishValue, and replay
-- **rx.coincidence.js** - reactive coincidence join event processing query operations
-- **rx.experimental.js** - experimental operators including imperative operators and forkJoin
-- **rx.joinpatterns.js** - join patterns event processing query operations
-- **rx.testing.js** - used to write unit tests for complex event processing queries.
-- **rx.time.js** - time-based event processing query operations.
-- **rx.virtualtime.js** - virtual-time-based schedulers.
+- [rx.lite.js](doc/libraries/rx.lite.md) - lite version with event bindings, creation, time and standard query operators with a compat file for older browsers.
+- [rx.js](doc/libraries/rx.md) - core library for ES5 compliant browsers and runtimes plus compatibility for older browsers.
+- [rx.aggregates.js](doc/libraries/rx.aggregates.md) - aggregation event processing query operations
+- [rx.async.js](doc/libraries/rx.async.md) - async operationrs such as events, callbacks and promises plus a compat file for older browsers.
+- [rx.binding.js](doc/libraries/rx.binding.md) - binding operators including multicast, publish, publishLast, publishValue, and replay
+- [rx.coincidence.js](doc/libraries/rx.coincidence.md) - reactive coincidence join event processing query operations
+- [rx.experimental.js](doc/libraries/rx.experimental.md) - experimental operators including imperative operators and forkJoin
+- [rx.joinpatterns.js](doc/libraries/rx.joinpatterns.md) - join patterns event processing query operations
+- [rx.testing.js](doc/libraries/rx.testing.md) - used to write unit tests for complex event processing queries
+- [rx.time.js](doc/libraries/rx.time.md) - time-based event processing query operations
+- [rx.virtualtime.js](doc/libraries/rx.virtualtime.md) - virtual-time-based schedulers
 
 ## Why RxJS? ##
 
@@ -92,10 +91,7 @@ To give you an idea about rich composition, we can create an autocompletion serv
 First, we'll reference the JavaScript files, including jQuery, although RxJS has no dependencies on jQuery...
 
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-    <script src="rx.js"></script>
-    <script src="rx.async.js"></script>
-    <script src="rx.binding.js"></script>
-    <script src="rx.time.js"></script>
+    <script src="rx.lite.js"></script>
 
 Next, we'll get the user input from an input, listening to the keyup event by using the `Rx.Observable.fromEvent` method.
 
@@ -189,7 +185,7 @@ You can find the documentation [here](https://github.com/Reactive-Extensions/RxJ
     - [Your Mouse is a Database](http://queue.acm.org/detail.cfm?id=2169076)
 
 - Tutorials
-    - [Learn RxJS](http://jhusain.github.io/learnrx/)
+    - [Learn RxJS](http://reactive-extensions.github.io/learnrx/)
     - [RxJS Koans](https://github.com/mattpodwysocki/RxJSKoans)
     - [Rx Workshop](http://rxworkshop.codeplex.com/)
 
@@ -290,6 +286,7 @@ require({
 
 The Reactive Extensions for JavaScript have no external dependencies any library, so they'll work well with just about any library.  We provide bridges and support for various libraries including:
 
+- [AngularJS](https://github.com/Reactive-Extensions/rx.angular.js)
 - [HTML DOM](https://github.com/Reactive-Extensions/RxJS-DOM)
 - [jQuery (1.4+)](https://github.com/Reactive-Extensions/RxJS-jQuery)
 - [MooTools](https://github.com/Reactive-Extensions/RxJS-MooTools)

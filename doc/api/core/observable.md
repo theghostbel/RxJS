@@ -11,8 +11,7 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 - [`case | switchCase`](#rxobservablecaseselector-sources-elsesourcescheduler)
 - [`catch | catchException`](#rxobservablecatchargs)
 - [`concat`](#rxobservableconcatargs)
-- [`create`](#rxobservablecreatesubscribe)
-- [`createWithDisposable`](#rxobservablecreatewithdisposablesubscribe)
+- [`create | createWithDisposable`](#rxobservablecreatesubscribe)
 - [`defer`](#rxobservabledeferobservablefactory)
 - [`empty`](#rxobservableemptyscheduler)
 - [`for | forIn`](#rxobservableforsources-resultselector)
@@ -64,6 +63,7 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 - [`catch | catchException`](#rxobservableprototypecatchsecond--handler)
 - [`combineLatest`](#rxobservableprototypecombinelatestargs-resultselector)
 - [`concat`](#rxobservableprototypeconcatargs)
+- [`concatAll`](#rxobservableprototypeconcatallargs)
 - [`connect`](#connectableobservableprototypeconnect)
 - [`contains`](#rxobservableprototypecontainsvalue-comparer)
 - [`count`](#rxobservableprototypecountpredicate)
@@ -102,7 +102,7 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 - [`max`](#rxobservableprototypemaxcomparer)
 - [`maxBy`](#rxobservableprototypemaxbykeyselector-comparer)
 - [`merge`](#rxobservableprototypemergemaxconcurrent--other)
-- [`mergeObservable`](#rxobservableprototypemergeobservable)
+- [`mergeAll`](#rxobservableprototypemergeobservable)
 - [`min`](#rxobservableprototypemincomparer)
 - [`minBy`](#rxobservableprototypeminbykeyselector-comparer)
 - [`multicast`](#rxobservableprototypemulticastsubject--subjectselector-selector)
@@ -112,6 +112,9 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 - [`publish`](#rxobservableprototypepublishselector)
 - [`publishLast`](#rxobservableprototypepublishlatestselector)
 - [`publishValue`](#rxobservableprototypepublishvalueselector)
+- [`share`](#rxobservableprototypeshare)
+- [`shareReplay`](#rxobservableprototypesharereplay-buffersize-window-scheduler)
+- [`shareValue`](#rxobservableprototypesharevalue)
 - [`refCount`](#connectableobservableprototyperefcount)
 - [`reduce`](#rxobservableprototypereduceaccumulator-seed)
 - [`repeat`](#rxobservableprototyperepeatrepeatcount)
@@ -122,6 +125,7 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 - [`select`](#rxobservableprototypeselectselector-thisarg)
 - [`selectMany`](#rxobservableprototypeselectmanyselector-resultselector)
 - [`selectSwitch`](#rxobservableprototypeselectswitchselector-thisarg)
+- [`sequenceEqual`](#rxobservableprototypesequenceequalsecond-comparer)
 - [`single`](#rxobservableprototypesinglepredicate-thisarg)
 - [`singleOrDefault`](#rxobservableprototypesingleordefaultpredicate-defaultvalue-thisarg)
 - [`skip`](#rxobservableprototypeskipcount)
@@ -159,7 +163,7 @@ The Observer and Objects interfaces provide a generalized mechanism for push-bas
 ## _Observable Methods_ ##
 
 ### <a id="rxobservableambargs"></a>`Rx.Observable.amb(...args)`
-<a href="#rxobservableambargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2862-L2872 "View in source") 
+<a href="#rxobservableambargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/amb.js#L8-L18 "View in source") 
 
 Propagates the observable sequence that reacts first.
 
@@ -193,12 +197,29 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/amb.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/amb.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+
+Unit Tests:
+- [/tests/observable/ambproto.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/ambproto.js)
 
 * * *
 
 ### <a id="rxobservablecaseselector-sources-elsesourcescheduler"></a>`Rx.Observable.case(selector, sources, [elseSource|scheduler])`
-<a href="#rxobservablecaseselector-sources-elsesourcescheduler">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.experimental.js#L159-L169 "View in source") 
+<a href="#rxobservablecaseselector-sources-elsesourcescheduler">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/case.js#L16-L27 "View in source") 
 
 Uses selector to determine which source in sources to use.  There is an alias 'switchCase' for browsers <IE9.
 
@@ -243,12 +264,28 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.experimental.js
+File:
+- [/src/core/observable/case.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/case.js)
+
+Dist:
+- [rx.experimental.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.experimental.js)
+
+Required Files:
+- rx.js | rx.compat.js | rx.lite.js | rx.lite.compat.js
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Experimental
+
+Unit Tests:
+- [/tests/observable/case.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/case.js)
 
 * * *
 
 ### <a id="rxobservablecatchargs"></a>`Rx.Observable.catch(...args)`
-<a href="#rxobservablecatchargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2920-L2923 "View in source") 
+<a href="#rxobservablecatchargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/catch.js#L9-L12 "View in source") 
 
 Continues an observable sequence that is terminated by an exception with the next observable sequence.  There is an alias for this method `catchException` for browsers <IE9
 
@@ -282,12 +319,32 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/catch.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/catch.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/catchexceptionproto.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/catchexceptionproto.js)
 
 * * *
 
 ### <a id="rxobservableconcatargs"></a>`Rx.Observable.concat(...args)`
-<a href="#rxobservableconcatargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L3035-L3038 "View in source") 
+<a href="#rxobservableconcatargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/concat.js#L9-L12 "View in source") 
 
 Concatenates all of the specified observable sequences, as long as the previous observable sequence terminated successfully.
 
@@ -299,8 +356,8 @@ Concatenates all of the specified observable sequences, as long as the previous 
 
 #### Example
 ```js
-var source1 = Rx.Observable.returnValue(42);
-var source2 = Rx.Observable.returnValue(56);
+var source1 = Rx.Observable.return(42);
+var source2 = Rx.Observable.return(56);
 
 var source = Rx.Observable.concat(source1, source2);
 
@@ -322,23 +379,44 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/concat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/concat.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/concatproto.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/concatproto.js)
 
 * * *
 
 ### <a id="rxobservablecreatesubscribe"></a>`Rx.Observable.create(subscribe)`
-<a href="#rxobservablecreatesubscribe">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2519-L2523 "View in source") 
+<a href="#rxobservablecreatesubscribe">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/create.js#L12-L14 "View in source") 
 
-Creates an observable sequence from a specified subscribe method implementation.
+Creates an observable sequence from a specified subscribe method implementation.  This is an alias for the `createWithDisposable` method
 
 #### Arguments
-1. `subscribe` *(Function)*: Implementation of the resulting observable sequence's subscribe method, optionally returning a function that will be wrapped in a disposable object.
+1. `subscribe` *(Function)*: Implementation of the resulting observable sequence's subscribe method, optionally returning a function that will be wrapped in a disposable object.  This could also be a disposable object.
 
 #### Returns
 *(Observable)*: The observable sequence with the specified implementation for the subscribe method.
 
 #### Example
 ```js
+/* Using a function */
 var source = Rx.Observable.create(function (observer) {
     observer.onNext(42);
     observer.onCompleted();
@@ -366,35 +444,16 @@ var subscription = source.subscribe(
 subscription.dispose();
 
 // => disposed
-```
 
-### Location
-
-- rx.js
-
-* * *
-
-### <a id="rxobservablecreatewithdisposablesubscribe"></a>`Rx.Observable.createWithDisposable(subscribe)`
-<a href="#rxobservablecreatewithdisposablesubscribe">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2535-L2537 "View in source") 
-
-Creates an observable sequence from a specified Subscribe method implementation.
-
-#### Arguments
-1. `subscribe` *(Function)*: Implementation of the resulting observable sequence's subscribe method.
-
-#### Returns
-*(Observable)*: The observable sequence with the specified implementation for the subscribe method.
-
-#### Example
-```js
-var source = Rx.Observable.createWithDisposable(function (observer) {
+/* Using a disposable */
+var source = Rx.Observable.create(function (observer) {
     observer.onNext(42);
     observer.onCompleted();
 
-    return Rx.Disposable.create(function () {
-        // Any cleanup that is required
+    // Note that this is optional, you do not have to return this if you require no cleanup
+    return function () {
         console.log('disposed');
-    });
+    };
 });
 
 var subscription = source.subscribe(
@@ -410,20 +469,37 @@ var subscription = source.subscribe(
 
 // => Next: 42
 // => Completed
-
-subscription.dispose();
-
-// => disposed
 ```
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/create.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/create.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/create.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/create.js)
+- [/tests/observable/createwithdisposable.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/createwithdisposable.js)
 
 * * *
 
 ### <a id="rxobservabledeferobservablefactory"></a>`Rx.Observable.defer(observableFactory)`
-<a href="#rxobservabledeferobservablefactory">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2549-L2559 "View in source") 
+<a href="#rxobservabledeferobservablefactory">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/defer.js#L9-L19 "View in source") 
 
 Returns an observable sequence that invokes the specified factory function whenever a new observer subscribes.
 
@@ -436,7 +512,7 @@ Returns an observable sequence that invokes the specified factory function whene
 #### Example
 ```js
 var source = Rx.Observable.defer(function () {
-    return Rx.Observable.returnValue(42);
+    return Rx.Observable.return(42);
 });
 
 var subscription = source.subscribe(
@@ -456,12 +532,32 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/defer.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/defer.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/defer.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/defer.js)
 
 * * *
 
 ### <a id="rxobservableemptyscheduler"></a>`Rx.Observable.empty([scheduler])`
-<a href="#rxobservableemptyscheduler">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2549-L2559 "View in source") 
+<a href="#rxobservableemptyscheduler">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/empty.js#L10-L17 "View in source") 
 
 Returns an empty observable sequence, using the specified scheduler to send out the single OnCompleted message.
 
@@ -491,12 +587,32 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.js
+File:
+- [/src/core/observable/empty.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/empty.js)
+
+Dist:
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/empty.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/empty.js)
 
 * * *
 
 ### <a id="rxobservableforsources-resultselector"></a>`Rx.Observable.for(sources, resultSelector)`
-<a href="#rxobservableforsources-resultselector">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L2549-L2559 "View in source") 
+<a href="#rxobservableforsources-resultselector">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/for.js#L8-L10 "View in source") 
 
 Concatenates the observable sequences obtained by running the specified result selector for each element in source.
 There is an alias for this method called `forIn` for browsers <IE9
@@ -537,12 +653,28 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.experimental.js
+File:
+- [/src/core/observable/for.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/for.js)
+
+Dist:
+- [rx.experimental.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.experimental.js)
+
+Required Files:
+- rx.js | rx.compat.js | rx.lite.js | rx.lite.compat.js
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Experimental
+
+Unit Tests:
+- [/tests/observable/for.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/for.js)
 
 * * *
 
 ### <a id="rxobservableforkjoinargs"></a>`Rx.Observable.forkJoin(...args)`
-<a href="#rxobservableforkjoinargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.experimental.js#L2549-L2559 "View in source") 
+<a href="#rxobservableforkjoinargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/forkjoin.js#L9-L57 "View in source") 
 
 Runs all observable sequences in parallel and collect their last elements.
 
@@ -577,7 +709,23 @@ var subscription = source.subscribe(
 
 ### Location
 
-- rx.experimental.js
+File:
+- [/src/core/observable/forkjoin.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/forkjoin.js)
+
+Dist:
+- [rx.experimental.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.experimental.js)
+
+Required Files:
+- rx.js | rx.compat.js | rx.lite.js | rx.lite.compat.js
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Experimental
+
+Unit Tests:
+- [/tests/observable/forkjoin.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/forkjoin.js)
 
 * * *
 
@@ -619,11 +767,26 @@ var subscription = source.subscribe(
 ### Location
 
 File:
-- /src/core/observable/fromarray.js
+- [/src/core/observable/fromarray.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/fromarray.js)
 
 Dist:
-- rx.js
-- rx.compat.js
+- [rx.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js)
+- [rx.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- <None>
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Main
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/fromarray.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/fromarray.js)
 
 * * *
 
@@ -678,11 +841,28 @@ var subscription = source.subscribe(
 ### Location
 
 File:
-- /src/core/observable/fromcallback.js
+- [/src/core/observable/fromcallback.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/fromcallback.js)
 
 Dist:
-- rx.async.js
-- rx.async.compat.js
+- [rx.async.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.async.js)
+- [rx.async.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.async.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- If using rx.async.js | rx.async.compat.js
+    - rx.js | rx.compat.js
+    - rx.binding.js
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Async
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/fromcallback.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/fromcallback.js)
 
 * * *
 
@@ -757,12 +937,30 @@ eventEmitter.emit('data', 'baz', 'quux');
 ### Location
 
 File:
-- /src/core/observable/fromevent.js
-- /src/core/observable/fromevent-modern.js
+- [/src/core/observable/fromevent.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/fromevent.js)
+- [/src/core/observable/fromevent-modern.js](https://github.com/Reactive-Extensions/RxJS/blob/master/src/core/linq/observable/fromevent-modern.js)
 
 Dist:
-- rx.async.js
-- rx.async.compat.js
+- [rx.async.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.async.js)
+- [rx.async.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.async.compat.js)
+- [rx.lite.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.js)
+- [rx.lite.compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.lite.compat.js)
+
+Required Files:
+- If using rx.async.js | rx.async.compat.js
+    - rx.js | rx.compat.js
+    - rx.binding.js
+
+NPM Packages:
+- rx
+
+NuGet Packages:
+- RxJS-Async
+- RxJS-Lite
+
+Unit Tests:
+- [/tests/observable/fromevent-compat.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/fromevent-compat.js)
+- [/tests/observable/fromevent.js](https://github.com/Reactive-Extensions/RxJS/blob/master/tests/observable/fromevent.js)
 
 * * *
 
@@ -1883,7 +2081,6 @@ Dist:
 - rx.js
 - rx.compat.js
 
-
 * * *
 
 ### <a id="rxobservableziparrayargs"></a>`Rx.Observable.zipArray(...args)`
@@ -1922,6 +2119,7 @@ var subscription = source.subscribe(
 // => Next: 1,2,3 
 // => Next: 2,3,4 
 // => Completed 
+```
 
 #### Location
 
@@ -2685,6 +2883,49 @@ var subscription = source.subscribe(
 // => Next: 72
 // => Completed 
 ```
+#### Location
+
+- rx.js
+
+* * *
+
+### <a id="rxobservableprototypeconcatallargs"></a>`Rx.Observable.prototype.concatAll()`
+<a href="#rxobservableprototypeconcatallargs">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L3223-L3227 "View in source") 
+
+Concatenates a sequence of observable sequences into a single observable sequence.
+
+#### Returns
+*(Observable)*: The observable sequence that merges the elements of the inner sequences. 
+ 
+#### Example
+```js
+var source = Rx.Observable.range(0, 3)
+    .map(function (x) { return Rx.Observable.range(x, 3); })
+    .concatAll();
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);   
+    },
+    function () {
+        console.log('Completed');   
+    });
+
+// => Next: 0 
+// => Next: 1 
+// => Next: 2 
+// => Next: 1 
+// => Next: 2 
+// => Next: 3 
+// => Next: 2 
+// => Next: 3 
+// => Next: 4 
+// => Completed     
+```
+
 #### Location
 
 - rx.js
@@ -4200,7 +4441,7 @@ var source = xs.groupJoin(
         return yy.select(function (y) { 
             return x + y; 
         })
-    }).mergeObservable().take(5);
+    }).mergeAll().take(5);
 
 var subscription = source.subscribe(
     function (x) {
@@ -4605,7 +4846,7 @@ Comonadic bind operator.
 ```js
 var source = Rx.Observable.range(0, 3)
     .manySelect(function (ys) { return ys.first(); })
-    .mergeObservable();
+    .mergeAll();
 
 var subscription = source.subscribe(
     function (x) {
@@ -4857,7 +5098,7 @@ var subscription = source.subscribe(
 
 * * *
 
-### <a id="rxobservableprototypemergeobservable"></a>`Rx.Observable.prototype.mergeObservable()`
+### <a id="rxobservableprototypemergeobservable"></a>`Rx.Observable.prototype.mergeAll()`
 <a href="#rxobservableprototypemergeobservable">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L3347-L3373 "View in source") 
 
 Merges an observable sequence of observable sequences into an observable sequence.
@@ -4869,7 +5110,7 @@ Merges an observable sequence of observable sequences into an observable sequenc
 ```js
 var source = Rx.Observable.range(0, 3)
     .map(function (x) { return Rx.Observable.range(x, 3); })
-    .mergeObservable();
+    .mergeAll();
 
 var subscription = source.subscribe(
     function (x) {
@@ -5009,7 +5250,7 @@ var subscription = source.subscribe(
 
 Multicasts the source sequence notifications through an instantiated subject into all uses of the sequence within a selector function. Each
 subscription to the resulting sequence causes a separate multicast invocation, exposing the sequence resulting from the selector function's
-invocation. For specializations with fixed subject types, see `publish`, , `publishValue`, `publishLast`, and `replay`.
+invocation. For specializations with fixed subject types, see `publish`, `share`, `publishValue`, `shareValue`, `publishLast`, `replay`, and `shareReplay`.
 
 #### Arguments
 1. `subjectSelector` *(Function)*:  Factory function to create an intermediate subject through which the source sequence's elements will be multicast to the selector function.
@@ -5275,6 +5516,102 @@ function createObserver(tag) {
 
 * * *
 
+### <a id="rxobservableprototypeshare"></a>`Rx.Observable.prototype.share()`
+<a href="#rxobservableprototypeshare">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.binding.js#L84-L90 "View in source") 
+
+Returns an observable sequence that shares a single subscription to the underlying sequence. 
+
+This operator is a specialization of `publish` which creates a subscription when the number of observers goes from zero to one, then shares that subscription with all subsequent observers until the number of observers returns to zero, at which point the subscription is disposed.
+
+#### Returns
+*(Observable)*: An observable sequence that contains the elements of a sequence produced by multicasting the source sequence.
+   
+#### Example
+```js
+/* Without share */
+var interval = Rx.Observable.interval(1000);
+
+var source = interval
+    .take(2)
+    .doAction(function (x) { 
+        console.log('Side effect');
+    });
+ 
+source.subscribe(createObserver('SourceA'));
+source.subscribe(createObserver('SourceB'));
+ 
+function createObserver(tag) {
+    return Rx.Observer.create(
+        function (x) {
+            console.log('Next: ' + tag + x);
+        },
+        function (err) {
+            console.log('Error: ' + err);   
+        },
+        function () {
+            console.log('Completed');   
+        });
+}
+
+// => Side effect
+// => Next: SourceA0 
+// => Side effect
+// => Next: SourceB0 
+// => Side effect
+// => Next: SourceA1 
+// => Completed
+// => Side effect
+// => Next: SourceB1 
+// => Completed  
+
+/* With share */
+var interval = Rx.Observable.interval(1000);
+
+var source = interval
+    .take(2)
+    .doAction(
+        function (x) { 
+            console.log('Side effect');
+        });
+ 
+var published = source.share();
+ 
+// When the number of observers subscribed to published observable goes from 
+// 0 to 1, we connect to the underlying observable sequence.
+published.subscribe(createObserver('SourceA'));
+// When the second subscriber is added, no additional subscriptions are added to the
+// underlying observable sequence. As a result the operations that result in side 
+// effects are not repeated per subscriber.
+published.subscribe(createObserver('SourceB'));
+
+function createObserver(tag) {
+    return Rx.Observer.create(
+        function (x) {
+            console.log('Next: ' + tag + x);
+        },
+        function (err) {
+            console.log('Error: ' + err);   
+        },
+        function () {
+            console.log('Completed');   
+        });
+}
+
+// => Side effect 
+// => Next: SourceA0 
+// => Next: SourceB0 
+// => Side effect 
+// => Next: SourceA1 
+// => Next: SourceB1
+// => Completed    
+```
+
+#### Location
+
+- rx.binding.js
+
+* * *
+
 ### <a id="rxobservableprototypepublishlatestselector"></a>`Rx.Observable.prototype.publishLatest([selector])`
 <a href="#rxobservableprototypepublishlatestselector">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.binding.js#L103-L109 "View in source") 
 
@@ -5361,6 +5698,62 @@ published.subscribe(createObserver('SourceA'));
 published.subscribe(createObserver('SourceB'));
  
 var connection = published.connect();
+
+function createObserver(tag) {
+    return Rx.Observer.create(
+        function (x) {
+            console.log('Next: ' + tag + x);
+        },
+        function (err) {
+            console.log('Error: ' + err);   
+        },
+        function () {
+            console.log('Completed');   
+        });
+}
+
+// => Next: SourceA42 
+// => Next: SourceB42 
+// => Side effect
+// => Next: SourceA0 
+// => Next: SourceB0 
+// => Side effect
+// => Next: SourceA1 
+// => Next: SourceB1 
+// => Completed 
+// => Completed     
+```
+
+#### Location
+
+- rx.binding.js
+
+* * *
+
+### <a id="rxobservableprototypesharevalue"></a>`Rx.Observable.prototype.shareValue()`
+<a href="#rxobservableprototypesharevalue">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.binding.js#L123-L129 "View in source") 
+
+Returns an observable sequence that shares a single subscription to the underlying sequence and starts with initialValue.
+   
+This operator is a specialization of `publishValue` which creates a subscription when the number of observers goes from zero to one, then shares that subscription with all subsequent observers until the number of observers returns to zero, at which point the subscription is disposed.
+
+#### Returns
+*(Observable)*: An observable sequence that contains the elements of a sequence produced by multicasting the source sequence.
+ 
+#### Example
+```js
+var interval = Rx.Observable.interval(1000);
+
+var source = interval
+    .take(2)
+    .doAction(function (x) { 
+        console.log('Side effect');
+    });
+ 
+var published = source.shareValue(42);
+ 
+published.subscribe(createObserver('SourceA'));
+published.subscribe(createObserver('SourceB'));
 
 function createObserver(tag) {
     return Rx.Observer.create(
@@ -5589,6 +5982,85 @@ function createObserver(tag) {
 // => Next: SourceB1 
 // => Next: SourceB0 
 // => Next: SourceB1 
+// => Completed 
+```
+
+#### Location
+
+- rx.binding.js
+
+* * *
+
+### <a id="rxobservableprototypesharereplay-buffersize-window-scheduler"></a>`Rx.Observable.prototype.shareReplay([bufferSize], [window], [scheduler])`
+<a href="#rxobservableprototypesharereplay-buffersize-window-scheduler">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.binding.js#L147-L153 "View in source") 
+
+Returns an observable sequence that shares a single subscription to the underlying sequence replaying notifications subject to a maximum time length for the replay buffer.
+
+This operator is a specialization of `replay` that connects to the connectable observable sequence when the number of observers goes from zero to one, and disconnects when there are no more observers.
+
+#### Arguments
+1. `[bufferSize]` *(Number)*: Maximum element count of the replay buffer.
+2. `[window]` *(Number)*: Maximum time length of the replay buffer in milliseconds.
+3. `[scheduler]` *(Scheduler)*: Scheduler where connected observers within the selector function will be invoked on.
+ 
+#### Returns
+*(Observable)*: An observable sequence that contains the elements of a sequence produced by multicasting the source sequence within a selector function.
+
+#### Example
+```js
+var interval = Rx.Observable.interval(1000);
+
+var source = interval
+    .take(4)
+    .doAction(function (x) { 
+        console.log('Side effect');
+    });
+ 
+var published = source
+    .shareReplay(3);
+ 
+published.subscribe(createObserver('SourceA'));
+published.subscribe(createObserver('SourceB'));
+
+// Creating a third subscription after the previous two subscriptions have 
+// completed. Notice that no side effects result from this subscription, 
+// because the notifications are cached and replayed. 
+Rx.Observable
+    .returnValue(true)
+    .delay(6000)
+    .flatMap(published)
+    .subscribe(createObserver('SourceC'));
+    
+function createObserver(tag) {
+    return Rx.Observer.create(
+        function (x) {
+            console.log('Next: ' + tag + x);
+        },
+        function (err) {
+            console.log('Error: ' + err);   
+        },
+        function () {
+            console.log('Completed');   
+        });
+}
+
+// => Side effect
+// => Next: SourceA0
+// => Next: SourceB0
+// => Side effect
+// => Next: SourceA1
+// => Next: SourceB1
+// => Side effect
+// => Next: SourceA2
+// => Next: SourceB2
+// => Side effect
+// => Next: SourceA3
+// => Next: SourceB3
+// => Completed
+// => Completed
+// => Next: SourceC1
+// => Next: SourceC2
+// => Next: SourceC3
 // => Completed 
 ```
 
@@ -5881,7 +6353,9 @@ var subscription = source.subscribe(
 
 - rx.js
 
-* * *### <a id="rxobservableprototypeselectswitchaselector-thisArg"></a>`Rx.Observable.prototype.selectSwitch(selector, [thisArg])`
+* * *
+
+### <a id="rxobservableprototypeselectswitchaselector-thisArg"></a>`Rx.Observable.prototype.selectSwitch(selector, [thisArg])`
 <a href="#rxobservableprototypeselectswitchaselector-thisArg">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L4311-L4326 "View in source") 
 
 This is an alias for the `selectSwitch` method.
@@ -5924,6 +6398,46 @@ var subscription = source.subscribe(
 #### Location
 
 - rx.js
+
+* * *
+
+## <a id="rxobservableprototypesequenceequalsecond-comparer"></a>`Rx.Observable.prototype.sequenceEqual(second, [comparer])`
+<a href="#rxobservableprototypesequenceequalsecond-comparer">#</a> [&#x24C8;](https://github.com/Reactive-Extensions/RxJS/blob/master/rx.js#L4311-L4326 "View in source") 
+
+Determines whether two sequences are equal by comparing the elements pairwise using a specified equality comparer.
+
+#### Arguments
+1. `second` *(Observable)*:  Second observable sequence or array to compare.
+2. `[comparer]` *(Function)*: Comparer used to compare elements of both sequences.
+ 
+#### Returns
+*(Observable)*: An observable sequence that contains a single element which indicates whether both sequences are of equal length and their corresponding elements are equal according to the specified equality comparer.   
+
+#### Example
+```js
+var source1 = Rx.Observable.return(42);
+var source2 = Rx.Observable.return(42);
+
+var source = source1.sequenceEqual(source2);
+
+var subscription = source.subscribe(
+    function (x) {
+        console.log('Next: ' + x);
+    },
+    function (err) {
+        console.log('Error: ' + err);   
+    },
+    function () {
+        console.log('Completed');   
+    });
+
+// => Next: true
+// => Completed 
+```
+
+#### Location
+
+- rx.aggregates.js
 
 * * *
 
